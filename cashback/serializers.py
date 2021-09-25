@@ -1,7 +1,8 @@
 import traceback
+import requests
+import json
 from rest_framework import serializers, exceptions
-from rest_framework.utils import model_meta
-
+from cashback.cashback_calc import CashbackCalc
 from cashback.models import Cashback
 from people.models import Customer
 from products.models import Product
@@ -48,8 +49,11 @@ class CashbackSerializer(serializers.ModelSerializer):
         ModelClass = self.Meta.model
         try:
             customer_data = validated_data.pop('customer')
-            customer = Customer.objects.create(**customer_data)
-            validated_data['customer'] = customer
+            if Customer.objects.filter(document=customer_data['document']):
+                validated_data['customer'] = Customer.objects.filter(document=customer_data['document']).first()
+            else:
+                customer = Customer.objects.create(**customer_data)
+                validated_data['customer'] = customer
 
             products = []
             products_data_list = validated_data.pop('products')
@@ -59,6 +63,28 @@ class CashbackSerializer(serializers.ModelSerializer):
 
             instance = ModelClass._default_manager.create(**validated_data)
             instance.products.set(products)
+
+            cashback_calc = CashbackCalc(instance)
+            total_cashback = cashback_calc.calc()
+            instance.cashback = total_cashback
+
+            response = requests.post(
+                url="https://5efb30ac80d8170016f7613d.mockapi.io/api/mock/Cashback",
+                data={
+                    "document": customer_data['document'],
+                    "cashback": str(total_cashback)
+                }
+            )
+
+            if response.status_code == 201:
+                response_content = json.loads(response.content)
+                instance.message = response_content['message']
+                instance.created_at = response_content['createdAt']
+                instance.returned_id = response_content['id']
+                instance.document = response_content['document']
+
+            else:
+                instance.message = "Error on registering cashback."
 
         except TypeError:
             tb = traceback.format_exc()

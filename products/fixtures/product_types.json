@@ -1,0 +1,34 @@
+[
+  {
+    "model": "products.producttype",
+    "pk": 1,
+    "fields": {
+      "type": "A",
+      "cashback_percent": 0.05
+    }
+  },
+  {
+    "model": "products.producttype",
+    "pk": 2,
+    "fields": {
+      "type": "B",
+      "cashback_percent": 0.01
+    }
+  },
+  {
+    "model": "products.producttype",
+    "pk": 3,
+    "fields": {
+      "type": "C",
+      "cashback_percent": 0.08
+    }
+  },
+  {
+    "model": "products.producttype",
+    "pk": 4,
+    "fields": {
+      "type": "D",
+      "cashback_percent": 0.1
+    }
+  }
+]

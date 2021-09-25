@@ -1,0 +1,10 @@
+[
+  {
+    "model": "people.customer",
+    "pk": 1,
+    "fields": {
+      "name": "Fulano",
+      "document": "12345678912"
+    }
+  }
+]
