@@ -11,3 +11,4 @@ class ProductViewSet(viewsets.ModelViewSet):
 class ProductTypeViewSet(viewsets.ModelViewSet):
     serializer_class = ProductTypeSerializer
     queryset = ProductType.objects.all()
+    http_method_names = ['get', 'post', 'put', 'delete', 'head']
