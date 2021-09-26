@@ -1,3 +1,4 @@
+import datetime
 import traceback
 import requests
 import json
@@ -13,6 +14,11 @@ from people.serializers import CustomerSerializer
 class CashbackSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(many=False)
     products = ProductSerializer(many=True, read_only=False, allow_null=False)
+
+    def validate_sold_at(self, sold_at):
+        if sold_at > datetime.datetime.now(datetime.timezone.utc):
+            raise exceptions.ValidationError('This field must not represent a future datetime.')
+        return  sold_at
 
 
     def validate_products(self, products):

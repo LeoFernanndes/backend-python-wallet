@@ -1,3 +1,4 @@
+import datetime
 import json
 from django.core.management import call_command
 from django.test import TestCase
@@ -21,7 +22,7 @@ class TestCreateCashback(TestCase):
         payload = {
             "customer": {
                 "name": "Nome",
-                "document": "12345678912"
+                "document": "79336512404"
             },
             "products": [
                 {
@@ -44,7 +45,7 @@ class TestCreateCashback(TestCase):
             'customer': {
                 'id': 1,
                 'name': 'Nome',
-                'document': '12345678912'
+                'document': '79336512404'
             },
             'products': [
                 {'id': 1, 'type': 'A', 'value': 50.0, 'qty': 1},
@@ -56,7 +57,7 @@ class TestCreateCashback(TestCase):
             'message': 'Cashback criado com sucesso!',
             # 'returned_id': 13,
             'cashback': 3.0,
-            'document': "12345678912"
+            'document': "79336512404"
         }
 
         client = authenticate_jwt_client_creds("user", "password")
@@ -68,12 +69,72 @@ class TestCreateCashback(TestCase):
         self.assertEqual(response_content, expected_result)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_create_cashback_invalid_document_400(self):
+        payload = {
+            "customer": {
+                "name": "Nome",
+                "document": "79336512404"
+            },
+            "products": [
+                {
+                    "type": "A",
+                    "value": 50,
+                    "qty": 1
+                },
+                {
+                    "type": "B",
+                    "value": 25,
+                    "qty": 2
+                }
+            ],
+            "sold_at": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1),
+            "total": 100
+        }
+
+        expected_result = {'sold_at': ['This field must not represent a future datetime.']}
+
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content, expected_result)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_cashback_future_sale_date_400(self):
+        payload = {
+            "customer": {
+                "name": "Nome",
+                "document": "12345678912"
+            },
+            "products": [
+                {
+                    "type": "A",
+                    "value": 50,
+                    "qty": 1
+                },
+                {
+                    "type": "B",
+                    "value": 25,
+                    "qty": 2
+                }
+            ],
+            "sold_at": "2021-09-19 21:12:31",
+            "total": 100
+        }
+
+        expected_result = {'customer': {'document': ['Invalid document.']}}
+
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content, expected_result)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     def test_create_cashback_empty_products_list_400(self):
         payload = {
             "customer": {
                 "name": "Nome",
-                "document": "12345678912"
+                "document": "79336512404"
             },
             "products": [
 
@@ -108,7 +169,7 @@ class TestCreateCashback(TestCase):
         payload = {
             "customer": {
                 "name": "Nome",
-                "document": "12345678912"
+                "document": "79336512404"
             },
             "products": [
                 {
@@ -138,7 +199,7 @@ class TestCreateCashback(TestCase):
         payload = {
             "customer": {
                 "name": "Nome",
-                "document": "12345678912"
+                "document": "79336512404"
             },
             "products": [
                 {
