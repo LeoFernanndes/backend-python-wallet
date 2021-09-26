@@ -3,11 +3,14 @@ from django.core.management import call_command
 from django.test import TestCase
 from rest_framework import status
 
+from utils import authenticate_jwt_client_creds
+
 
 class TestCreateCashback(TestCase):
     @classmethod
     def setUpClass(cls):
         call_command("loaddata", "product_types")
+        call_command("loaddata", "users")
         pass
 
     def setUp(self):
@@ -56,7 +59,8 @@ class TestCreateCashback(TestCase):
             'document': "12345678912"
         }
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
         response_content = json.loads(response.content)
         response_content.pop('returned_id')
         response_content.pop('created_at')
@@ -80,7 +84,8 @@ class TestCreateCashback(TestCase):
 
         expected_result = {'products': ['This field must not be an empty list.']}
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -93,7 +98,8 @@ class TestCreateCashback(TestCase):
         expected_result = {'customer': ['This field is required.'], 'products': ['This field is required.'],
                            'sold_at': ['This field is required.'], 'total': ['This field is required.']}
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -122,7 +128,8 @@ class TestCreateCashback(TestCase):
 
         expected_result = {'non_field_errors': ['Inconsistent value sum.']}
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -151,7 +158,8 @@ class TestCreateCashback(TestCase):
 
         expected_result = {'total': ['This field must not be a negative sum.']}
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

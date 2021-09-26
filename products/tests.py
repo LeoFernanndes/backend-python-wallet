@@ -1,9 +1,18 @@
 import json
+
+from django.core.management import call_command
 from django.test import TestCase
 from rest_framework import status
+from utils import authenticate_jwt_client_creds
 
 
 class TestCreateProductType(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        call_command("loaddata", "product_types")
+        call_command("loaddata", "users")
+        pass
 
     def setUp(self):
         self.base_url = "/api/product-types/"
@@ -20,7 +29,8 @@ class TestCreateProductType(TestCase):
             'type': 'Z'
         }
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload)
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -35,6 +45,11 @@ class TestCreateProductType(TestCase):
             'cashback_percent': ['This field must not be a negative value.']
         }
 
-        response = self.client.post(self.base_url, payload, content_type='application/json')
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload)
         self.assertEqual(json.loads(response.content), expected_result)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
