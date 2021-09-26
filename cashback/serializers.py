@@ -41,6 +41,11 @@ class CashbackSerializer(serializers.ModelSerializer):
         if sum != float(total):
             raise exceptions.ValidationError("Inconsistent value sum.")
 
+        customer = Customer.objects.filter(document=self.context['request'].data['customer']['document']).first()
+        if customer:
+            if customer.name != self.context['request'].data['customer']['name']:
+                raise exceptions.ValidationError("Customer data does not match document.")
+
         unknown = set(self.initial_data) - set(attrs.keys())
         if unknown:
             raise exceptions.ValidationError({"Unknown field(s)": "{}".format(", ".join(unknown))})

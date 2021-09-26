@@ -11,6 +11,7 @@ class TestCreateCashback(TestCase):
     @classmethod
     def setUpClass(cls):
         call_command("loaddata", "product_types")
+        call_command("loaddata", "customers")
         call_command("loaddata", "users")
         pass
 
@@ -21,7 +22,7 @@ class TestCreateCashback(TestCase):
     def test_create_cashback_201(self):
         payload = {
             "customer": {
-                "name": "Nome",
+                "name": "Fulano",
                 "document": "79336512404"
             },
             "products": [
@@ -44,7 +45,7 @@ class TestCreateCashback(TestCase):
             'id': 1,
             'customer': {
                 'id': 1,
-                'name': 'Nome',
+                'name': 'Fulano',
                 'document': '79336512404'
             },
             'products': [
@@ -65,9 +66,38 @@ class TestCreateCashback(TestCase):
         response_content = json.loads(response.content)
         response_content.pop('returned_id')
         response_content.pop('created_at')
-
         self.assertEqual(response_content, expected_result)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_cashback_inconsistent_customer_400(self):
+        payload = {
+            "customer": {
+                "name": "Inconsistent Name",
+                "document": "79336512404"
+            },
+            "products": [
+                {
+                    "type": "A",
+                    "value": 50,
+                    "qty": 1
+                },
+                {
+                    "type": "B",
+                    "value": 25,
+                    "qty": 2
+                }
+            ],
+            "sold_at": "2021-09-19 21:12:31",
+            "total": 100
+        }
+
+        expected_result = {'non_field_errors': ['Customer data does not match document.']}
+
+        client = authenticate_jwt_client_creds("user", "password")
+        response = client.post(self.base_url, payload, format="json")
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content, expected_result)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_cashback_invalid_document_400(self):
         payload = {
