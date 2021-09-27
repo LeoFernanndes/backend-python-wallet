@@ -54,6 +54,10 @@ in entrypoint.sh may be used to validade jwt tokens.
 The single command we must now run is ```sudo docker-compose up --build``` in order
 to get our application running localhost with swagger ui documentation on root.
 
+In order to get access token to be used for api testing, go to swagger ui /token/ with:
+> username=user\
+> password=password
+
 Hope yoy enjoy.\
 Any doubt, please contact contato@leobalbino.com.
 

@@ -116,4 +116,5 @@ class CashbackSerializer(serializers.ModelSerializer):
                     )
             )
             raise TypeError(msg)
+        instance.save()
         return instance
