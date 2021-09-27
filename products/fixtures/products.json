@@ -1,0 +1,56 @@
+[
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "type": "A",
+      "value": 100.0,
+      "qty": 1
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "type": "B",
+      "value": 50.0,
+      "qty": 5
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 3,
+    "fields": {
+      "type": "B",
+      "value": 150.0,
+      "qty": 1
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 4,
+    "fields": {
+      "type": "C",
+      "value": 100.0,
+      "qty": 3
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "type": "D",
+      "value": 130.0,
+      "qty": 1
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "type": "C",
+      "value": 100.0,
+      "qty": 1
+    }
+  }
+]
